@@ -1,0 +1,56 @@
+---
+- hosts: kodi
+
+  vars:
+    userdata_dir: ~/.kodi/userdata
+
+  tasks:
+   - debug: var=userdata_dir
+
+   - name: Copy passwords.xml
+     copy:
+       src=/etc/ansible/kodi_files/passwords.xml
+       dest={{ userdata_dir }}/passwords.xml
+
+   - name: Copy RssFeeds.xml
+     copy:
+       src=/etc/ansible/kodi_files/RssFeeds.xml
+       dest={{ userdata_dir }}/RssFeeds.xml
+
+   - name: Copy upnpserver.xml
+     copy:
+       src=/etc/ansible/kodi_files/upnpserver.xml
+       dest={{ userdata_dir }}/upnpserver.xml
+
+   - name: Copy profiles.xml
+     copy:
+       src=/etc/ansible/kodi_files/profiles.xml
+       dest={{ userdata_dir }}/profiles.xml
+
+   - name: Copy sources.xml to ~/.kodi/userdata
+     copy:
+       src=/etc/ansible/kodi_files/sources.xml
+       dest={{ userdata_dir }}/sources.xml
+
+   - name: Copy advancedsettings.xml to ~/.kodi/userdata
+     copy:
+       src=/etc/ansible/kodi_files/advancedsettings.xml
+       dest={{ userdata_dir }}/advancedsettings.xml
+
+   - name: Copy guisettings.xml to ~/.kodi/userdata
+     copy:
+       src=/etc/ansible/kodi_files/guisettings.xml
+
+   - name: Replace text in file with hostname
+     replace:
+       dest={{ userdata_dir }}/guisettings.xml
+       regexp=<devicename>.*?</devicename>
+       replace=<devicename>{{ inventory_hostname }}</devicename>
+
+   - name: Reboot the XIOS so things work!
+     shell: /sbin/reboot
+     async: 0
+     poll: 0
+     ignore_errors: true
+
+

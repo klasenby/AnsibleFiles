@@ -1,0 +1,41 @@
+---
+- hosts: kodi
+  tasks:
+
+   - name: Check to see if xbmc-data exists
+     stat: path=/media/sdcard/xbmc-data
+     register: xbmc_data
+
+   - name: Check to see if kodi-data exists
+     stat: path=/media/sdcard/kodi-data
+     register: kodi_data
+
+   - name: Check to see if tofu-data exists
+     stat: path=/media/sdcard/tofu-data
+     register: tofu_data
+
+   - name: Create xbmc-data directory if it doesn't exist
+     command: mkdir /media/sdcard/xbmc-data
+     when: xbmc_data.stat.exists == False
+
+   - name: Create kodi-data directory if it doesn't exist
+     command: mkdir /media/sdcard/kodi-data
+     when: kodi_data.stat.exists == False
+
+   - name: Create tofu-data directory if it doesn't exist
+     command: mkdir /media/sdcard/tofu-data
+     when: tofu_data.stat.exists == False
+
+   - name: Copy update.img to /media/sdcard on each Kodi box
+     copy: src=/etc/ansible/kodi_files/update.img dest=/media/sdcard/update.img
+
+   - name: Get update script from pivosforums
+     shell: wget http://www.pivosforums.com/download/file.php?id=646 -O /media/sdcard/freeflash_TOFULinux.sh
+
+   - name: Change script permissions
+     shell: chmod 755 /media/sdcard/freeflash_TOFULinux.sh
+
+   - name: Execute script to update OS
+     shell: /media/sdcard/freeflash_TOFULinux.sh /media/sdcard/update.img
+     args:
+       executable: "/bin/sh"
